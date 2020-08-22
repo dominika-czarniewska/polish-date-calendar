@@ -1,85 +1,77 @@
 <?php
-class PolishCalendar
-{
+
+class PolishCalendar {
     private $transfer_date;
     private $year;
     private $month;
     private $day;
-    
-    public function __construct($transfer_date)
-    {
-        $this->transfer_date = strtotime($transfer_date);
-        $this->day           = date('j', strtotime($transfer_date));
-        $this->month         = date('n', strtotime($transfer_date));
-        $this->year          = date('Y', strtotime($transfer_date));
-        $this->week_day      = date('N', strtotime($transfer_date));
+
+    public function __construct( string $transfer_date ) {
+        $this->transfer_date = strtotime( $transfer_date );
+        $this->day           = date( 'j', strtotime( $transfer_date ) );
+        $this->month         = date( 'n', strtotime( $transfer_date ) );
+        $this->year          = date( 'Y', strtotime( $transfer_date ) );
+        $this->week_day      = date( 'N', strtotime( $transfer_date ) );
     }
-    
-    public function getEasterDate()
-    {
+
+    public function getEasterDate() {
         $year = $this->year;
-        
+
         $a = $year % 19;
         $b = $year % 4;
         $c = $year % 7;
-        $d = ($a * 19 + 24) % 30;
-        $e = (2 * $b + 4 * $c + 6 * $d + 5) % 7;
-        
-        if ($d == 29 && $e == 6)
+        $d = ( $a * 19 + 24 ) % 30;
+        $e = ( 2 * $b + 4 * $c + 6 * $d + 5 ) % 7;
+
+        if ( $d == 29 && $e == 6 ) {
             $d -= 7;
-        if ($d == 28 && $e == 6 && $a > 10)
+        }
+        if ( $d == 28 && $e == 6 && $a > 10 ) {
             $d -= 7;
-        
+        }
+
         $control_date = $year . '-03-22';
         $sum          = $d + $e;
-        $easter_date  = date('y-m-d', strtotime($control_date . ' +' . $sum . 'day'));
-        
+        $easter_date  = date( 'y-m-d', strtotime( $control_date . ' +' . $sum . 'day' ) );
+
         return $easter_date;
     }
-    
-    public function isHoliday()
-    {
-        $day   = $this->day;
-        $month = $this->month;
-        
-        $easter_date = $this->getEasterDate();
-        
-        $easter_day   = date('j', strtotime($easter_date));
-        $easter_month = date('n', strtotime($easter_date));
-        
-        $christ_date  = date('y-m-d', strtotime($this->transfer_date . '- 60 day'));
-        $christ_day   = date('j', strtotime($christ_date));
-        $christ_month = date('n', strtotime($christ_date));
-        
-        if ($month == 1 && $day == 1)
-            return true; // Nowy Rok
-        if ($month == 1 && $day == 6)
-            return true; //trzech kroli
-        if ($month == 5 && $day == 1)
-            return true; // 1 maja
-        if ($month == 5 && $day == 3)
-            return true; // 3 maja
-        if ($month == 8 && $day == 15)
-            return true; // Wniebowzięcie Najświętszej Marii Panny, Święto Wojska Polskiego
-        if ($month == 11 && $day == 1)
-            return true; // Dzień Wszystkich Świętych
-        if ($month == 11 && $day == 11)
-            return true; // Dzień Niepodległości 
-        if ($month == 12 && $day == 25)
-            return true; // Boże Narodzenie
-        if ($month == 12 && $day == 26)
-            return true; // Boże Narodzenie
-        if ($month == $easter_month && ($day - 1) == $easter_day)
-            return true; // poniedziałek Wielkanocny
-        if ($month == $christ_month && $day == $christ_day)
-            return true; // Boże Ciało
-        
-        return false;
+
+    public function isHoliday(): bool {
+        $easter_date  = $this->getEasterDate();
+        $easter_day   = date( 'j', strtotime( $easter_date ) );
+        $easter_month = date( 'n', strtotime( $easter_date ) );
+        $christ_date  = date( 'y-m-d', strtotime( $this->transfer_date . '- 60 day' ) );
+        $christ_day   = date( 'j', strtotime( $christ_date ) );
+        $christ_month = date( 'n', strtotime( $christ_date ) );
+
+        $nowy_rok          = $this->month == 1 && $this->day == 1;
+        $trzech_kroli      = $this->month == 1 && $this->day == 6;
+        $pierwszy_maja     = $this->month == 5 && $this->day == 1;
+        $trzeci_maja       = $this->month == 5 && $this->day == 3;
+        $sw_wojska_pl      = $this->month == 8 && $this->day == 15;
+        $sw_zmarlych       = $this->month == 11 && $this->day == 1;
+        $sw_niepodleglosci = $this->month == 11 && $this->day == 11;
+        $boze_narodzenie_1 = $this->month == 12 && $this->day == 25;
+        $boze_narodzenie_2 = $this->month == 12 && $this->day == 26;
+        $boze_cialo        = $this->month == $christ_month && $this->day == $christ_day;
+        $pon_wielkanocny   = $this->month == $easter_month && ( $this->day - 1 ) == $easter_day;
+
+        return $nowy_rok
+               || $trzech_kroli
+               || $pierwszy_maja
+               || $trzeci_maja
+               || $sw_wojska_pl
+               || $sw_zmarlych
+               || $sw_niepodleglosci
+               || $boze_narodzenie_1
+               || $boze_narodzenie_2
+               || $boze_cialo
+               || $pon_wielkanocny;
     }
-    
-    public function translateMonthName()
-    {
-        $months = array(
+
+    public function translateMonthName(): string {
+        $months = [
             '',
             'Styczeń',
             'Luty',
@@ -92,14 +84,14 @@ class PolishCalendar
             'Wrzesień',
             'Październik',
             'Listopad',
-            'Grudzień'
-        );
-        return $months[$this->month];
+            'Grudzień',
+        ];
+
+        return $months[ $this->month ];
     }
-    
-    public function translateDayName()
-    {
-        $days = array(
+
+    public function translateDayName(): string {
+        $days = [
             '',
             'Poniedziałek',
             'Wtorek',
@@ -107,22 +99,9 @@ class PolishCalendar
             'Czwartek',
             'Piątek',
             'Sobota',
-            'Niedziala'
-        );
-        return $days[$this->week_day];
+            'Niedziala',
+        ];
+
+        return $days[ $this->week_day ];
     }
 }
-
-$calendar = new PolishCalendar('2010-04-05'); //deklaracja przykladowej daty we wskazanym formacie
-
-if ($calendar->isHoliday() == true) { //isHoliday sprawdza czy jest jakies swieto które nie odbywa się domyślnie w niedziele
-    echo 'jest jakies swieto';
-} else {
-    echo 'niestety nie ma swieta';
-}
-
-echo $calendar->getEasterDate(); //zwraca datę wielkanocy w danym roku
-
-echo $calendar->translateMonthName(); // nazwa danego miesiaca
-
-echo $calendar->translateDayName(); //nazwa danego dnia tygodnia
