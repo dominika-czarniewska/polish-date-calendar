@@ -14,7 +14,7 @@ class PolishCalendar {
         $this->week_day      = date( 'N', strtotime( $transfer_date ) );
     }
 
-    public function getEasterDate() {
+    public function getEasterDate(): string {
         $year = $this->year;
 
         $a = $year % 19;
